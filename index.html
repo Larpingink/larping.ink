@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plein</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+     body {
+  background-image: url('assets/pleinbg.png'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(40, 40, 40, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: opacity 1s ease;
+      cursor: pointer;
+    }
+    .enter-text {
+      font-size: 2.5rem;
+      color: #ccc;
+      text-align: center;
+      padding: 20px 40px;
+      border: 2px solid #999;
+      border-radius: 16px;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    .overlay:hover .enter-text {
+      color: #fff;
+      border-color: #fff;
+      text-shadow: 0 0 10px #fff;
+    }
+    .main-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      position: relative;
+      z-index: 5;
+    }
+    .main-content.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .card {
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      background: #111;
+      width: 300px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+      margin-bottom: 20px;
+    }
+    .card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 2px solid #fff;
+    }
+    .name {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .bio {
+      color: #aaa;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    .link a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      border: 1px solid #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: background 0.3s;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .link a:hover {
+      background: #fff;
+      color: #000;
+    }
+    .play-btn {
+      color: #fff;
+      background: #222;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+    .play-btn:hover {
+      background: #fff;
+      color: #000;
+      box-shadow: 0 0 15px #fff;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay" id="overlay" onclick="enterSite()">
+    <div class="enter-text">Enter</div>
+  </div>
+
+  <div class="main-content" id="mainContent">
+    <div class="card">
+      <img src="assets/plein-modified.png" alt="Plein's photo">
+      <div class="name">Plein</div>
+      <div class="bio">white and proud</div>
+      <div class="link">
+        <a href="https://t.me/pleinmm" target="_blank">Click here</a>
+      </div>
+    </div>
+    <button class="play-btn" onclick="toggleMusic()">Play / Pause Music</button>
+  </div>
+
+  <canvas id="rain-canvas"></canvas>
+
+  <audio id="bg-music" loop>
+    <source src="assets/test.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    const music = document.getElementById('bg-music');
+    const overlay = document.getElementById('overlay');
+    const mainContent = document.getElementById('mainContent');
+    const canvas = document.getElementById('rain-canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let particles = [];
+
+    class Particle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.length = Math.random() * 20 + 10;
+        this.speedY = Math.random() * 4 + 4;
+        this.alpha = 1;
+      }
+      update() {
+        this.y += this.speedY;
+        this.alpha -= 0.02;
+      }
+      draw() {
+        ctx.strokeStyle = `rgba(255,255,255,${this.alpha})`;
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x, this.y + this.length);
+        ctx.stroke();
+      }
+    }
+
+    function animateRain() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, i) => {
+        p.update();
+        p.draw();
+        if (p.alpha <= 0) particles.splice(i, 1);
+      });
+      requestAnimationFrame(animateRain);
+    }
+
+    function spawnRain(e) {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      for (let i = 0; i < 5; i++) {
+        particles.push(new Particle(mouse.x + (Math.random() - 0.5) * 40, mouse.y + (Math.random() - 0.5) * 40));
+      }
+    }
+
+    function enterSite() {
+      overlay.style.opacity = 0;
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        mainContent.classList.add('active');
+        music.play();
+        animateRain();
+        window.addEventListener('mousemove', spawnRain);
+      }, 1000);
+    }
+
+    function toggleMusic() {
+      if (music.paused) {
+        music.play();
+      } else {
+        music.pause();
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
