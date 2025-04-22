@@ -1,0 +1,94 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - Doxbin Clone</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: monospace;
+      padding: 0;
+      margin: 0;
+    }
+
+    .navbar {
+      background-color: #1e1e1e;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .navbar a {
+      color: #ff4b4b;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 15px;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .form-section {
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #000;
+      margin-top: 40px;
+    }
+
+    input {
+      width: 100%;
+      background-color: #000;
+      color: #0f0;
+      border: 1px solid #444;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-family: monospace;
+    }
+
+    button {
+      background-color: #ff4b4b;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    h1 {
+      color: #ff4b4b;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div>
+      <a href="/">Home</a>
+      <a href="/upload">Upload</a>
+      <a href="/recent">Recent</a>
+    </div>
+    <div>
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="form-section">
+      <h1>Register</h1>
+      <form action="/register" method="POST">
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
