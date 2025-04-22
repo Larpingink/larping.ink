@@ -1,7 +1,8 @@
-from flask import Flask, request, redirect, render_template_string, session, url_for
+from flask import Flask, request, redirect, render_template, session, url_for
 import sqlite3
 from uuid import uuid4
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -42,7 +43,7 @@ def upload():
             conn.execute("INSERT INTO pastes (id, user_id, title, content, created_at) VALUES (?, ?, ?, ?, ?)",
                          (paste_id, session['user_id'], title, content, created_at))
         return redirect(f'/view/{paste_id}')
-    return render_template_string(open("index.html").read())
+    return render_template('upload.html')
 
 @app.route('/view/<paste_id>')
 def view_paste(paste_id):
@@ -79,7 +80,7 @@ def login():
                 session['user_id'] = result[0]
                 return redirect('/upload')
         return "Invalid login"
-    return render_template_string(open("index.html").read())
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -92,7 +93,7 @@ def register():
             except sqlite3.IntegrityError:
                 return "Username already taken"
         return redirect('/login')
-    return render_template_string(open("index.html").read())
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
