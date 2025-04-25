@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Larp loader</title>
+  <title>larping.ink loader</title>
   <style>
     body {
       background-color: black;
@@ -95,33 +95,26 @@
       );
       pointer-events: none;
       z-index: 0;
-      animation: warp 2s infinite linear;
+      animation: warp 3s infinite linear;
     }
 
-    /* Warp animation for CRT lines */
+    /* Smooth warp animation for CRT lines */
     @keyframes warp {
       0% {
         transform: translateY(0);
       }
+      25% {
+        transform: translateY(2px);
+      }
       50% {
-        transform: translateY(-5px) skewY(2deg);
+        transform: translateY(-2px);
+      }
+      75% {
+        transform: translateY(1px);
       }
       100% {
-        transform: translateY(5px) skewY(-2deg);
+        transform: translateY(0);
       }
-    }
-
-    /* Apply a slight disorientation on the lines */
-    .boot-line {
-      animation: disorient 1.5s infinite;
-    }
-
-    @keyframes disorient {
-      0% { transform: rotate(0deg); }
-      25% { transform: rotate(1deg); }
-      50% { transform: rotate(-1deg); }
-      75% { transform: rotate(0.5deg); }
-      100% { transform: rotate(0deg); }
     }
   </style>
 </head>
@@ -148,13 +141,14 @@
       "[OK] Memory: 64GB DDR5-6000 CL30 initialized",
       "[--] Running memory diagnostic...",
       "[OK] PCI bridge detected and initialized",
-      "[OK] SATA AHCI controller initialized",
       "[OK] Ethernet controller: Realtek RTL8125B initialized",
+      "[OK] Loading system drivers: nvidia.ko, audio.ko, net.ko",
       "[!!] ACPI: Temperature threshold warning (CPU: 75°C)",
       "[!!] USB controller failed to respond (Code 43)",
       "[--] Starting system services [1/3]...",
       "[OK] Service manager initialized",
       "[OK] Graphical interface ready",
+      "[OK] SSH server ready",
       "[OK] Cron jobs initialized",
       "[OK] Monitoring daemons running",
       "[OK] User session initialized"
