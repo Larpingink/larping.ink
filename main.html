@@ -1,7 +1,4 @@
-
 <style>
-
-
     body {
         background-color: rgba(10, 10, 10, 0.95);
         height: 100%;
@@ -13,7 +10,7 @@
         color: #FFFFFF;
         background-image: url('l (1).png');
         background-size: cover;
-        overflow: hidden; 
+        overflow: hidden;
     }
 
     .logo {
@@ -29,7 +26,7 @@
         justify-content: center;
         align-items: center;
         font-size: 28;
-        text-decoration: none
+        text-decoration: none;
     }
 
     .members:hover {
@@ -40,7 +37,7 @@
     .music {
         opacity: 0;
         width: 0px;
-        height: 0px
+        height: 0px;
     }
 
     #container {
@@ -48,14 +45,14 @@
         bottom: 10px;
         left: 30px;
         color: white;
-        opacity: .25
+        opacity: .25;
     }
 
-    .animegirl{
+    .animegirl {
         position: absolute;
         bottom: 0px;
         right: 0px;
-        width:350px;
+        width: 350px;
         opacity: .9;
     }
 
@@ -68,21 +65,21 @@
         object-position: center;
         display: inline;
         left: 200px;
-        top: 200px
+        top: 200px;
     }
 
     .message {
         color: white;
         margin-top: auto;
         height: 5%;
-		font-size: 40
+        font-size: 40;
     }
 
     .scare {
         color: white;
         margin-top: 10px;
         height: 5%;
-		font-size: 40
+        font-size: 40;
     }
 
     .archives {
@@ -91,79 +88,125 @@
         font-size: 35px;
     }
 
+    /* CRT line effect */
     body:before {
-	content: "";
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	pointer-events: none;
-	z-index: 1000;
-	background-image: url(overlay.png);
-	background-repeat: all;
-	background-position: 0px 0px;
-	animation-name: Static;
-	animation-duration: 2s;
-	animation-iteration-count: infinite;
-	animation-timing-function: steps(4);
-	box-shadow: inset 0px 0px 10em rgba(0,0,0,0.4);
-}
+        content: "";
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+        background-image: url(overlay.png);
+        background-repeat: all;
+        background-position: 0px 0px;
+        animation-name: Static;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+        animation-timing-function: steps(4);
+        box-shadow: inset 0px 0px 10em rgba(0, 0, 0, 0.4);
+    }
 
-body:after {
-	content: "";
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	pointer-events: none;
-	z-index: 1000;
-	background-image: url(overlay2.png);
-	background-repeat: all;
-	background-position: 0px 0px;
-	animation-name: Static;
-	animation-duration: 0.8s;
-	animation-iteration-count: infinite;
-	animation-timing-function: steps(4);
-}
+    body:after {
+        content: "";
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+        background-image: url(overlay2.png);
+        background-repeat: all;
+        background-position: 0px 0px;
+        animation-name: Static;
+        animation-duration: 0.8s;
+        animation-iteration-count: infinite;
+        animation-timing-function: steps(4);
+    }
 
-@keyframes Static {
-	0% { background-position: 0px 0px; }
-	100% { background-position: 0px 4px; }
-}
+    @keyframes Static {
+        0% {
+            background-position: 0px 0px;
+        }
+        100% {
+            background-position: 0px 4px;
+        }
+    }
+
+    /* CRT lines animation */
+    .crt-lines::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.03),
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px,
+            transparent 2px
+        );
+        pointer-events: none;
+        z-index: 0;
+        animation: warp 3s infinite linear;
+    }
+
+    /* Smooth warp animation for CRT lines */
+    @keyframes warp {
+        0% {
+            transform: translateY(0);
+        }
+        25% {
+            transform: translateY(2px);
+        }
+        50% {
+            transform: translateY(-2px);
+        }
+        75% {
+            transform: translateY(1px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+
 </style>
 <script>
     function PlayMusic() {
-    
-      var play=document.getElementById("music");
-      play.volume = 0.1;
-      play.play();
+        var play = document.getElementById("music");
+        play.volume = 0.1;
+        play.play();
     }
-    
-    $(document).ready(function(){
-      setTimeout(PlayMusic,3000);
+
+    $(document).ready(function () {
+        setTimeout(PlayMusic, 3000);
     })
 </script>
 <audio autoplay loop class="music" controls="controls" id="music">
     <source src="song.mp3" type="audio/mp3">
-</audio> 
+</audio>
 
 <title>Instakill</title>
 <link rel="icon" href="angels.png" type="image/png" sizes="32x32">
-    <p1 class="message"><center>instakill</center></p1>
-    <center>
-        <br><br><a class="members">Sun</a><br>
-            <a class="members">Net</a><br>
-            <a class="members">Perk</a><br> 
-        </center>
-    <div id="container">
-    </div>
-    <div class="message">
-        <a class="archives" href="archives.html"><center>soon...</center></a>
-    </div>
-    <div class="archive">
-        <br><br>
-    </div>
-            
-</body></html>
+<p1 class="message">
+    <center>instakill</center>
+</p1>
+<center>
+    <br><br><a class="members">sun</a><br>
+    <a class="members">net</a><br>
+    <a class="members">perk</a><br>
+</center>
+<div id="container">
+</div>
+<div class="message">
+    <a class="archives" href="archives.html"><center>soon...</center></a>
+</div>
+<div class="archive">
+    <br><br>
+</div>
+</body>
+</html>
