@@ -1,101 +1,193 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Doxbin Clone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Larps only.</title>
   <style>
     body {
-      background-color: #121212;
-      color: #e0e0e0;
-      font-family: monospace;
-      padding: 0;
-      margin: 0;
-    }
-
-    .navbar {
-      background-color: #1e1e1e;
-      padding: 10px;
-      display: flex;
-      gap: 15px;
-      justify-content: space-between;
-    }
-
-    .navbar a {
-      color: #ff4b4b;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
-    }
-
-    textarea, input {
-      width: 100%;
-      background-color: #000;
-      color: #0f0;
-      border: 1px solid #444;
-      padding: 10px;
-      margin-bottom: 10px;
-      font-family: monospace;
-    }
-
-    button {
-      background-color: #ff4b4b;
+      background-color: black;
       color: #fff;
-      border: none;
-      padding: 10px;
+      font-family: "Courier New", Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      cursor: default;
+    }
+
+    #terminal {
+      max-width: 800px;
+      width: 100%;
+      padding: 2rem;
+    }
+
+    .boot-line {
+      white-space: pre;
+      line-height: 1.5;
+    }
+
+    .ok { color: #00ff00; font-weight: bold; }
+    .warn { color: #ff0000; font-weight: bold; }
+    .temp { color: orange; font-weight: bold; }
+
+    .center {
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    #boot-status {
+      display: none;
       font-weight: bold;
+      color: white;
+      font-size: 1.5rem;
+      margin-top: 150px;
+    }
+
+    #boot-end {
+      display: none;
+      font-weight: bold;
+      color: white;
+      font-size: 1.5rem;
+      margin-top: 150px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    #boot-warning {
+      display: none;
+      color: #00ff00;
+      font-size: 1rem;
+      margin-top: 5px;
+    }
+
+    #continue {
+      display: none;
+      color: #ccc;
+      font-size: 1rem;
+      margin-top: 10px;
+      text-decoration: underline;
       cursor: pointer;
-    }
-
-    .form-section {
-      background-color: #1e1e1e;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #000;
-    }
-
-    h1 {
-      color: #ff4b4b;
     }
   </style>
 </head>
 <body>
-  <div class="navbar">
-    <div>
-      <a href="/">Home</a>
-      <a href="/upload">Upload</a>
-      <a href="/recent">Recent</a>
-    </div>
-    <div>
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
-    </div>
+  <div id="terminal"></div>
+
+  <div class="center">
+    <div id="boot-status"></div>
+    <div id="boot-end"></div>
+    <div id="boot-warning"></div>
+    <div id="continue" onclick="continueClicked()">click to continue</div>
   </div>
 
-  <div class="container">
-    <div class="form-section">
-      <h1>Upload a Paste</h1>
-      <form action="/upload" method="POST">
-        <input type="text" name="title" placeholder="Title" required>
-        <textarea name="content" placeholder="Your paste..." required></textarea>
-        <button type="submit">Upload</button>
-      </form>
-    </div>
+  <script>
+    const terminal = document.getElementById("terminal");
+    const bootStatus = document.getElementById("boot-status");
+    const bootEnd = document.getElementById("boot-end");
+    const bootWarning = document.getElementById("boot-warning");
+    const continueBtn = document.getElementById("continue");
 
-    <div class="form-section" style="margin-top: 40px;">
-      <h1>Login</h1>
-      <form action="/login" method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  </div>
+    const bootLines = [
+      "[--] Loading kernel modules...",
+      "[OK] CPU: AMD Ryzen 9 7950X detected at 5.7 GHz",
+      "[OK] Memory: 64GB DDR5-6000 CL30 initialized",
+      "[--] Running memory diagnostic...",
+      "[OK] PCI bridge detected and initialized",
+      "[OK] SATA AHCI controller initialized",
+      "[OK] Ethernet controller: Realtek RTL8125B initialized",
+      "[OK] Loading system drivers: nvidia.ko, audio.ko, net.ko",
+      "[!!] ACPI: Temperature threshold warning (CPU: 75°C)",
+      "[!!] USB controller failed to respond (Code 43)",
+      "[--] Starting system services [1/3]...",
+      "[OK] Service manager initialized",
+      "[OK] Network service started",
+      "[OK] Audio service started",
+      "[OK] Graphical interface ready",
+      "[OK] SSH server ready",
+      "[OK] Cron jobs initialized",
+      "[OK] Logger service online",
+      "[OK] Monitoring daemons running",
+      "[OK] User session initialized"
+    ];
+
+    function typeText(el, text, cb, delay = 15) {
+      let i = 0;
+      el.textContent = "";
+      function typeChar() {
+        if (i < text.length) {
+          el.textContent += text[i++];
+          setTimeout(typeChar, delay);
+        } else {
+          cb && cb();
+        }
+      }
+      typeChar();
+    }
+
+    function typeLine(line, cb) {
+      let j = 0;
+      const span = document.createElement("div");
+      span.className = "boot-line";
+      terminal.appendChild(span);
+
+      function colorizeText(text) {
+        return text
+          .replace(/\[OK\]/g, '<span class="ok">[OK]</span>')
+          .replace(/\[!!\]/g, '<span class="warn">[!!]</span>')
+          .replace(/75°C/g, '<span class="temp">75°C</span>');
+      }
+
+      function typer() {
+        if (j < line.length) {
+          span.textContent += line[j++];
+          setTimeout(typer, 15);
+        } else {
+          span.innerHTML = colorizeText(span.textContent);
+          cb();
+        }
+      }
+
+      typer();
+    }
+
+    function processLines(i = 0) {
+      if (i === 0) {
+        bootStatus.style.display = "block";
+        typeText(bootStatus, "SYSTEM BOOTING...", () => {
+          setTimeout(() => processLines(i + 1), 300);
+        });
+        return;
+      }
+
+      if (i - 1 >= bootLines.length) {
+        bootEnd.style.display = "block";
+        typeText(bootEnd, "SYSTEM BOOTED", () => {
+          setTimeout(() => {
+            bootWarning.textContent = "ignoring warnings";
+            bootWarning.style.display = "block";
+            continueBtn.style.display = "block";
+            document.body.style.cursor = "pointer";
+            document.body.onclick = continueClicked;
+          }, 500);
+        });
+        return;
+      }
+
+      const line = bootLines[i - 1];
+      typeLine(line, () => processLines(i + 1));
+    }
+
+    function continueClicked() {
+      alert("Continue clicked");
+    }
+
+    processLines();
+  </script>
 </body>
 </html>
