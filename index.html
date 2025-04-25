@@ -88,34 +88,15 @@
       height: 100%;
       background: repeating-linear-gradient(
         to bottom,
-        rgba(255,255,255,0.03),
-        rgba(255,255,255,0.03) 1px,
+        rgba(255, 255, 255, 0.05),
+        rgba(255, 255, 255, 0.05) 1px,
         transparent 1px,
         transparent 2px
       );
       pointer-events: none;
       z-index: 0;
-      animation: warp 3s infinite linear;
     }
 
-    /* Smooth warp animation for CRT lines */
-    @keyframes warp {
-      0% {
-        transform: translateY(0);
-      }
-      25% {
-        transform: translateY(2px);
-      }
-      50% {
-        transform: translateY(-2px);
-      }
-      75% {
-        transform: translateY(1px);
-      }
-      100% {
-        transform: translateY(0);
-      }
-    }
   </style>
 </head>
 <body class="crt-lines">
@@ -147,7 +128,6 @@
       "[!!] USB controller failed to respond (Code 43)",
       "[--] Starting system services [1/3]...",
       "[OK] Service manager initialized",
-      "[OK] Graphical interface ready",
       "[OK] SSH server ready",
       "[OK] Cron jobs initialized",
       "[OK] Monitoring daemons running",
@@ -222,7 +202,7 @@
     }
 
     function continueClicked() {
-      window.location.href = "main.html";
+      window.location.href = "main";
     }
 
     processLines();
