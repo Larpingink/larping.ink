@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>guns.lol clone</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 100px; }
+    input, button { padding: 10px; margin: 5px; width: 300px; }
+  </style>
+</head>
+<body>
+  <h1>Create Your Link</h1>
+  <input id="username" placeholder="Custom name (e.g., johndoe)" /><br/>
+  <input id="url" placeholder="Destination URL (e.g., https://example.com)" /><br/>
+  <button onclick="createLink()">Create</button>
+  <p id="result"></p>
+
+  <script>
+    async function createLink() {
+      const username = document.getElementById('username').value;
+      const url = document.getElementById('url').value;
+
+      if (!username || !url) {
+        alert('Please fill in both fields.');
+        return;
+      }
+
+      // Send data to backend
+      const res = await fetch('/api/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, url })
+      });
+
+      if (res.ok) {
+        document.getElementById('result').textContent =
+          `Link created: ${window.location.origin}/${username}`;
+      } else {
+        document.getElementById('result').textContent =
+          'Error creating link.';
+      }
+    }
+  </script>
+</body>
+</html>
