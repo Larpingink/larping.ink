@@ -3,55 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nigger</title>
+  <title>guap</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #121212;
-      color: #ffffff;
+      overflow: hidden;
+      background: #000;
+      color: #0ff;
+      font-family: monospace;
+      height: 100%;
     }
 
-    .container {
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 3em;
-      margin-bottom: 0.5em;
-    }
-
-    p {
-      color: #aaa;
-      font-size: 1.2em;
-    }
-
-    a.button {
-      display: inline-block;
-      margin-top: 1em;
-      padding: 0.5em 1.2em;
-      background: #00cc99;
-      color: #000;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-
-    a.button:hover {
-      background: #00e6ac;
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Hello, World!</h1>
-    <p>I hate niggers.</p>
-    <a href="https://c22w.site" class="button">Click Me</a>
-  </div>
+  <canvas id="asciiCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('asciiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const chars = ['.', '+', 'o', '*', '°', '•', '○'];
+    const particles = [];
+
+    for (let i = 0; i < 150; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        char: chars[Math.floor(Math.random() * chars.length)],
+        size: 12 + Math.random() * 8,
+        dx: (Math.random() - 0.5) * 0.8,
+        dy: (Math.random() - 0.5) * 0.8,
+        alpha: Math.random() * 0.5 + 0.5
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of particles) {
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = '#0cf';
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.char, p.x, p.y);
+        p.x += p.dx;
+        p.y += p.dy;
+
+        // Wrap around screen
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+      }
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // Resize canvas on window resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
 </body>
 </html>
