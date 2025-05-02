@@ -1,22 +1,61 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>starfire</title>
+  <title>larping</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
     body, html {
       margin: 0;
+      padding: 0;
       overflow: hidden;
       background: black;
+      color: #d3aaff;
+      font-family: 'VT323', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
     }
+
     canvas {
       display: block;
+      margin-top: 20px;
+    }
+
+    .info {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .info h1 {
+      font-size: 40px;
+      margin: 10px 0;
+    }
+
+    .links a {
+      display: block;
+      color: #d3aaff;
+      text-decoration: none;
+      font-size: 24px;
+      margin: 4px 0;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
+
+<div class="info">
+  <h1>dorm</h1>
+  <div class="links">
+    <a href="https://t.me/yourusername" target="_blank">Telegram</a>
+    <a href="https://doxbin.org/yourlink" target="_blank">Doxbin</a>
+  </div>
+</div>
 
 <script>
 const canvas = document.getElementById('canvas');
@@ -42,19 +81,19 @@ canvas.addEventListener('touchend', () => mouse.down = false);
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.height = window.innerHeight * 0.6;
 }
 
 class Particle {
   constructor(x, y, color) {
     this.homeX = x;
     this.homeY = y;
-    this.x = x + Math.random() * 50 - 25;
-    this.y = y + Math.random() * 50 - 25;
+    this.x = x + Math.random() * 20 - 10;
+    this.y = y + Math.random() * 20 - 10;
     this.vx = 0;
     this.vy = 0;
     this.color = color;
-    this.size = Math.random() < 0.5 ? 1 : 2;
+    this.size = 1; // smaller size
   }
 
   update() {
@@ -91,29 +130,31 @@ class Particle {
   }
 }
 
-// Load image
 const img = new Image();
 img.src = '300px-StarfireTeenTitans-ezgif.com-webp-to-png-converter.png'; // your image
 img.onload = () => {
+  const scale = 0.5; // Scale image to 50%
   const tempCanvas = document.createElement('canvas');
   const tempCtx = tempCanvas.getContext('2d');
-  tempCanvas.width = img.width;
-  tempCanvas.height = img.height;
-  tempCtx.drawImage(img, 0, 0);
+  const w = img.width * scale;
+  const h = img.height * scale;
+  tempCanvas.width = w;
+  tempCanvas.height = h;
+  tempCtx.drawImage(img, 0, 0, w, h);
 
-  const imageData = tempCtx.getImageData(0, 0, img.width, img.height).data;
+  const imageData = tempCtx.getImageData(0, 0, w, h).data;
 
-  for (let y = 0; y < img.height; y += 4) {
-    for (let x = 0; x < img.width; x += 4) {
-      let index = (y * img.width + x) * 4;
+  for (let y = 0; y < h; y += 4) {
+    for (let x = 0; x < w; x += 4) {
+      let index = (y * w + x) * 4;
       let r = imageData[index];
       let g = imageData[index + 1];
       let b = imageData[index + 2];
       let a = imageData[index + 3];
 
       if (a > 128) {
-        let offsetX = (canvas.width - img.width) / 2;
-        let offsetY = (canvas.height - img.height) / 2;
+        let offsetX = (canvas.width - w) / 2;
+        let offsetY = (canvas.height - h) / 2;
         let color = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
         particles.push(new Particle(x + offsetX, y + offsetY, color));
       }
