@@ -2,45 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>guns.lol clone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nigger</title>
   <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 100px; }
-    input, button { padding: 10px; margin: 5px; width: 300px; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #121212;
+      color: #ffffff;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0.5em;
+    }
+
+    p {
+      color: #aaa;
+      font-size: 1.2em;
+    }
+
+    a.button {
+      display: inline-block;
+      margin-top: 1em;
+      padding: 0.5em 1.2em;
+      background: #00cc99;
+      color: #000;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    a.button:hover {
+      background: #00e6ac;
+    }
   </style>
 </head>
 <body>
-  <h1>Create Your Link</h1>
-  <input id="username" placeholder="Custom name (e.g., johndoe)" /><br/>
-  <input id="url" placeholder="Destination URL (e.g., https://example.com)" /><br/>
-  <button onclick="createLink()">Create</button>
-  <p id="result"></p>
-
-  <script>
-    async function createLink() {
-      const username = document.getElementById('username').value;
-      const url = document.getElementById('url').value;
-
-      if (!username || !url) {
-        alert('Please fill in both fields.');
-        return;
-      }
-
-      // Send data to backend
-      const res = await fetch('/api/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, url })
-      });
-
-      if (res.ok) {
-        document.getElementById('result').textContent =
-          `Link created: ${window.location.origin}/${username}`;
-      } else {
-        document.getElementById('result').textContent =
-          'Error creating link.';
-      }
-    }
-  </script>
+  <div class="container">
+    <h1>Hello, World!</h1>
+    <p>I hate niggers.</p>
+    <a href="https://c22w.site" class="button">Click Me</a>
+  </div>
 </body>
 </html>
