@@ -1,81 +1,136 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>larping niggers.</title>
+  <title>starfire</title>
   <style>
-    body {
-      background-color: black;
-      color: #00ff00;
-      font-family: 'Courier New', Courier, monospace;
+    body, html {
       margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       overflow: hidden;
+      background: black;
     }
-
-    .container {
-      text-align: center;
-      animation: glitch 1s infinite;
-    }
-
-    h1 {
-      font-size: 4rem;
-      text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00;
-    }
-
-    p {
-      font-size: 1.5rem;
-      margin: 20px 0;
-    }
-
-    a {
-      color: #00ff00;
-      text-decoration: none;
-      font-size: 1.2rem;
-      border: 1px solid #00ff00;
-      padding: 10px 20px;
-      display: inline-block;
-      margin-top: 20px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    a:hover {
-      background-color: #00ff00;
-      color: black;
-    }
-
-    @keyframes glitch {
-      0% {
-        text-shadow: 2px 2px #00ff00, -2px -2px #ff00ff;
-      }
-      20% {
-        text-shadow: -2px -2px #ff00ff, 2px 2px #00ff00;
-      }
-      40% {
-        text-shadow: 4px 4px #00ff00, -4px -4px #ff00ff;
-      }
-      60% {
-        text-shadow: -4px -4px #ff00ff, 4px 4px #00ff00;
-      }
-      80% {
-        text-shadow: 2px 2px #00ff00, -2px -2px #ff00ff;
-      }
-      100% {
-        text-shadow: -2px -2px #ff00ff, 2px 2px #00ff00;
-      }
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Welcome, niggers....</h1>
-    <p>Access the matrix and control the grid.</p>
-    <a href="c22w.site">Enter</a>
-  </div>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+resizeCanvas();
+
+let particles = [];
+let mouse = { x: 0, y: 0, radius: 120, down: false };
+
+window.addEventListener('resize', resizeCanvas);
+canvas.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+canvas.addEventListener('mousedown', () => mouse.down = true);
+canvas.addEventListener('mouseup', () => mouse.down = false);
+canvas.addEventListener('touchmove', e => {
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+});
+canvas.addEventListener('touchstart', () => mouse.down = true);
+canvas.addEventListener('touchend', () => mouse.down = false);
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+class Particle {
+  constructor(x, y, color) {
+    this.homeX = x;
+    this.homeY = y;
+    this.x = x + Math.random() * 50 - 25;
+    this.y = y + Math.random() * 50 - 25;
+    this.vx = 0;
+    this.vy = 0;
+    this.color = color;
+    this.size = Math.random() < 0.5 ? 1 : 2;
+  }
+
+  update() {
+    let dx = this.homeX - this.x;
+    let dy = this.homeY - this.y;
+    this.vx += dx * 0.02;
+    this.vy += dy * 0.02;
+
+    let mx = this.x - mouse.x;
+    let my = this.y - mouse.y;
+    let dist = Math.sqrt(mx * mx + my * my);
+    if (dist < mouse.radius) {
+      let force = (mouse.radius - dist) / mouse.radius;
+      let angle = Math.atan2(my, mx);
+      if (mouse.down) {
+        this.vx += Math.cos(angle) * force * 5;
+        this.vy += Math.sin(angle) * force * 5;
+      } else {
+        this.vx += Math.cos(angle) * force * 2;
+        this.vy += Math.sin(angle) * force * 2;
+      }
+    }
+
+    this.vx *= 0.85;
+    this.vy *= 0.85;
+
+    this.x += this.vx;
+    this.y += this.vy;
+  }
+
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.size, this.size);
+  }
+}
+
+// Load image
+const img = new Image();
+img.src = '300px-StarfireTeenTitans-ezgif.com-webp-to-png-converter.png'; // your image
+img.onload = () => {
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCanvas.width = img.width;
+  tempCanvas.height = img.height;
+  tempCtx.drawImage(img, 0, 0);
+
+  const imageData = tempCtx.getImageData(0, 0, img.width, img.height).data;
+
+  for (let y = 0; y < img.height; y += 4) {
+    for (let x = 0; x < img.width; x += 4) {
+      let index = (y * img.width + x) * 4;
+      let r = imageData[index];
+      let g = imageData[index + 1];
+      let b = imageData[index + 2];
+      let a = imageData[index + 3];
+
+      if (a > 128) {
+        let offsetX = (canvas.width - img.width) / 2;
+        let offsetY = (canvas.height - img.height) / 2;
+        let color = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+        particles.push(new Particle(x + offsetX, y + offsetY, color));
+      }
+    }
+  }
+
+  animate();
+};
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let p of particles) {
+    p.update();
+    p.draw();
+  }
+  requestAnimationFrame(animate);
+}
+</script>
 </body>
 </html>
