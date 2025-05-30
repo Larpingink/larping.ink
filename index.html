@@ -1,118 +1,293 @@
-<!DOCTYPE html><html lang="en"><head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home @ Resist</title>
-  <link rel="stylesheet" href="niggers.css">
-  <script disable-devtool-auto src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dorm | Pink Glitter + Rainbow Rain + Unicorn Follow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
+    /* Glittery Pink Background */
+    body {
+      margin: 0;
+      height: 100vh;
+      background: 
+        radial-gradient(circle at 30% 30%, #ff99cc 5%, transparent 10%),
+        radial-gradient(circle at 70% 70%, #ff66b3 5%, transparent 10%),
+        repeating-radial-gradient(circle, #ffb6c1 0, #ffb6c1 2px, #ff69b4 3px, #ff69b4 5px);
+      background-blend-mode: screen;
+      font-family: 'Share Tech Mono', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: #fff;
+      position: relative;
+      cursor: default;
+    }
 
+    /* Glitter sparkle animation */
+    @keyframes glitter {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .glitter {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #fff;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 4px #ff69b4);
+      animation: glitter 2s infinite ease-in-out;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Card container */
+    .card {
+      position: relative;
+      background: rgba(255, 105, 180, 0.25);
+      border: 2px solid #ff66b3;
+      border-radius: 20px;
+      padding: 2rem 3rem;
+      width: 320px;
+      box-shadow:
+        0 0 10px #ff66b3,
+        inset 0 0 15px #ffb6c1;
+      z-index: 10;
+      text-align: center;
+      user-select: none;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow:
+        0 0 20px #ff33aa,
+        inset 0 0 30px #ff69b4;
+    }
+
+    .card h1 {
+      font-size: 3rem;
+      margin-bottom: 0.3rem;
+      text-shadow: 0 0 10px #ff99cc;
+    }
+
+    .card p {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 5px #ffb6c1;
+      color: #fff;
+    }
+
+    .links a {
+      display: inline-block;
+      margin: 0 0.8rem;
+      text-decoration: none;
+      font-weight: 600;
+      color: #ff99cc;
+      padding: 0.4rem 0.8rem;
+      border: 2px solid #ff99cc;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      box-shadow: 0 0 8px #ff69b4;
+    }
+
+    .links a:hover {
+      background-color: #ff66b3;
+      color: white;
+      box-shadow: 0 0 12px #ff33aa;
+    }
+
+    /* SKID ALERT overlay */
+    #skid-alert {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 9999;
+      pointer-events: none;
+      text-align: center;
+      font-size: 5em;
+      font-weight: 900;
+      font-family: 'Share Tech Mono', monospace;
+      user-select: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Rainbow rain container and particles */
+    #rainbow-rain {
+      pointer-events: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: visible;
+      z-index: 5;
+    }
+
+    .raindrop {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation-name: fall, drift;
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: infinite, infinite;
+      animation-direction: normal, alternate;
+      filter: drop-shadow(0 0 4px);
+    }
+
+    /* fall anim: from top to bottom */
+    @keyframes fall {
+      0% { transform: translateY(-20px); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(110vh); opacity: 0; }
+    }
+
+    /* horizontal drift anim */
+    @keyframes drift {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(20px); }
+    }
+
+    /* Unicorn emoji container */
+    #unicorn {
+      position: fixed;
+      top: 50px;
+      left: 50px;
+      font-size: 3.8rem;
+      z-index: 20;
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0 0 7px #ff69b4);
+      transition: transform 0.1s ease-out;
+      will-change: transform;
+    }
+  </style>
 </head>
 <body>
+  <!-- Glitter sparkle dots -->
+  <div class="glitter" style="top: 15%; left: 20%; animation-delay: 0s;"></div>
+  <div class="glitter" style="top: 40%; left: 50%; animation-delay: 0.7s;"></div>
+  <div class="glitter" style="top: 75%; left: 70%; animation-delay: 1.4s;"></div>
+  <div class="glitter" style="top: 30%; left: 80%; animation-delay: 2.1s;"></div>
+  <div class="glitter" style="top: 85%; left: 30%; animation-delay: 2.8s;"></div>
 
-<div id="main-container">
-  <pre class="ascii">  
-   ░▒▓███████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░░▒▓███████▓▒░░▒▓████████▓▒░▒▓█▓▒░      ░▒▓█▓▒░▒▓███████▓▒░░▒▓████████▓▒░ 
-░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
-░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
- ░▒▓██████▓▒░░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░░▒▓██████▓▒░ ░▒▓█▓▒░      ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓██████▓▒░   
-       ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
-       ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
-░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░ 
-  ₙₑₜ ₘₐ𝒹ₑ ₜₕᵢₛ ₜ.ₘₑ/𝒸ᵣᵢₘₑ𝒸ᵢₜₐₜᵢₒₙ                                                                                                      
-                                                                                                                
-                                                                                  
-  </pre> 
-                                                                                                                                                            
-                                                                                                                                                            
-<div id="navbar-container" style="display: block;">
-<ul class="nav">
-  <li><a href="index.html" class="selected">Home</a></li>
-  <li><a href="members.html">Owner</a></li>
+  <div class="card">
+    <h1>Dorm</h1>
+    <p>I love pink fluffy unicorns!!!!!</p>
+    <div class="links">
+      <a href="https://t.me/coolnigga234" target="_blank" rel="noopener noreferrer">Telegram</a>
+      <a href="https://github.com/niggerlover123123123" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="mailto:dorm@gmail.com">Email</a>
+    </div>
+  </div>
 
+  <div id="rainbow-rain"></div>
 
+  <div id="unicorn">🦄</div>
 
+  <div id="skid-alert"></div>
 
-</ul>
-<div id="navbar-scrolling">
-  <p class="mon">
-      <span class="scroll">
-      </span>
-      <span></span>
-  </p>  
-</div>
-</div>
-<div class="content-bottom">
-<div id="bottom-container" style="flex-grow: 1;">
-<div class="bottom">
-  <h1 class="bottom-header">Welcome to Shoreline,</h1>
-  <p class="bottom-p">
-      Shoreline, a pedophile and extorter hunting group, Owned by Resist<br>
-      To see Owners, click Owner tab.<br>
-      <br><br>
-      <span style="color: white;">Goals,</span>
-      <br>
-      Our goal is to expose and bring down the disgusting people of the internet <br>To see some of our work, check out our <a href="https://doxbin.org/user/2sp">doxbin profile</a>
-      <br>
-      <br>
-      <span style="color: white;">Shoreline </span> 
-      <br>
-      If you would like to apply to join, DM  <a href="https://https://t.me/coolnigga234">@resist</a> on telegram<br>
-      There are open spots in Shorline as of 2025/05/07.
-      <br>
-      <br>
-      <span style="color: white;">Anonymous Tips</span>
-      <br>
-      If you have evidence and information on a pedophile, or extorter you can contact <a href="https://t.me/coolnigga234">@resist</a> on Telegram.<br> This will be completely anonymous.
-  </p>
-</div>
-</div>
-<div id="enter-overlay" onclick="enterSite()">
-  <div class="glitch">Click to enter</div>
-<script>
-function enterSite() {
-  const overlay = document.getElementById('enter-overlay');
-  overlay.style.display = 'none';
-  toggleMusic(); 
-}
-const audioFiles = [
-    { src: "https://files.catbox.moe/fg0ofk.mp3" }, 
-    { src: "https://files.catbox.moe/fg0ofk.mp3" },
-    { src: "https://files.catbox.moe/fg0ofk.mp3" },
-    { src: "https://files.catbox.moe/fg0ofk.mp3" }, 
-    { src: "https://files.catbox.moe/fg0ofk.mp3" },
-];
+  <script>
+    // Right-click SKID ALERT feature
+    window.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+      const alertDiv = document.getElementById("skid-alert");
+      alertDiv.style.display = "flex";
 
-let currentTrack = Math.floor(Math.random() * audioFiles.length);
-const music = new Audio(audioFiles[currentTrack].src);
-music.muted = false;  
-music.preload = "auto";  
+      let flashing = true;
+      let colorToggle = false;
 
-function toggleMusic() {
-    if (music.paused) {
-        music.play()
-            .then(() => {
-                console.log(`Now playing track ${currentTrack}`);
-            })
-            .catch(error => console.error("Playback failed:", error));
-    } else {
-        music.pause();
+      const flashInterval = setInterval(() => {
+        if (!flashing) {
+          clearInterval(flashInterval);
+          return;
+        }
+        alertDiv.style.backgroundColor = colorToggle ? "red" : "white";
+        alertDiv.style.color = colorToggle ? "white" : "red";
+        alertDiv.textContent = "SKID ALERT!!!!!!!!!";
+        colorToggle = !colorToggle;
+      }, 100);
+    });
+
+    // Rainbow rain effect
+    const container = document.getElementById('rainbow-rain');
+    const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF'];
+
+    function createRaindrop() {
+      const drop = document.createElement('div');
+      drop.classList.add('raindrop');
+
+      // size 4-14 px
+      const size = Math.random() * 10 + 4;
+      drop.style.width = size + 'px';
+      drop.style.height = size + 'px';
+
+      // random color from rainbow
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      drop.style.backgroundColor = color;
+      drop.style.filter = `drop-shadow(0 0 6px ${color})`;
+
+      // random horizontal start position
+      drop.style.left = Math.random() * window.innerWidth + 'px';
+
+      // random animation durations
+      const fallDuration = Math.random() * 6 + 4; // 4-10 seconds
+      const driftDuration = Math.random() * 4 + 3; // 3-7 seconds
+      drop.style.animationDuration = `${fallDuration}s, ${driftDuration}s`;
+
+      // random animation delay
+      drop.style.animationDelay = `${Math.random() * 10}s, ${Math.random() * 7}s`;
+
+      // random opacity for depth
+      drop.style.opacity = (Math.random() * 0.5 + 0.5).toFixed(2);
+
+      container.appendChild(drop);
+
+      // Remove after animation ends
+      setTimeout(() => {
+        container.removeChild(drop);
+      }, fallDuration * 1000 + 1000);
     }
-}
 
-music.addEventListener("ended", () => {
-    let nextTrack;
-    do {
-        nextTrack = Math.floor(Math.random() * audioFiles.length);
-    } while (nextTrack === currentTrack);
+    // Create raindrops continuously
+    setInterval(createRaindrop, 100);
 
-    currentTrack = nextTrack;
-    music.src = audioFiles[currentTrack].src;
-    music.play()
-        .then(() => {
-            console.log(`Now playing track ${currentTrack}`);
-        })
-        .catch(error => console.error("Playback failed:", error));
-});
-</script>
-</div></div></body></html>
+    // Initial batch
+    for (let i = 0; i < 50; i++) {
+      setTimeout(createRaindrop, i * 150);
+    }
+
+    // Unicorn follow mouse with smooth easing
+    const unicorn = document.getElementById('unicorn');
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let unicornX = mouseX;
+    let unicornY = mouseY;
+
+    window.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function animate() {
+      // ease toward mouse pos (0.1 = speed)
+      unicornX += (mouseX - unicornX) * 0.1;
+      unicornY += (mouseY - unicornY) * 0.1;
+
+      // offset unicorn so cursor is near center bottom of unicorn emoji
+      const offsetX = 20;
+      const offsetY = 40;
+
+      unicorn.style.transform = `translate3d(${unicornX - offsetX}px, ${unicornY - offsetY}px, 0)`;
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
