@@ -154,3 +154,12 @@ window.addEventListener('resize', () => {
 resizeCanvas();
 init();
 animate();
+// DELIBERATELY UNSAFE XSS DEMO
+const submitBtn = document.getElementById("submit-btn");
+const userInput = document.getElementById("user-input");
+const output = document.getElementById("output");
+
+submitBtn.addEventListener("click", () => {
+  const input = userInput.value;
+  output.innerHTML = input; 
+});
