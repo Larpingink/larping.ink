@@ -2,86 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>For Dorm 🏳️‍🌈</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Comfortaa&display=swap');
-
-    body {
-      margin: 0;
-      background: #0e0e0e;
-      font-family: 'Comfortaa', sans-serif;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-      flex-direction: column;
-    }
-
-    .container {
-      border: 2px solid transparent;
-      border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1;
-      padding: 3rem;
-      border-radius: 20px;
-      max-width: 600px;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      animation: fadeIn 2s ease;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      font-size: 1.2rem;
-      line-height: 1.6;
-    }
-
-    .rainbow {
-      background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .links {
-      margin-top: 2rem;
-    }
-
-    .links a {
-      color: #fff;
-      margin: 0 10px;
-      text-decoration: none;
-      background: rgba(255,255,255,0.1);
-      padding: 10px 20px;
-      border-radius: 10px;
-      transition: 0.3s;
-    }
-
-    .links a:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title></title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1 class="rainbow">Dorm is OUT & PROUD 🏳️‍🌈</h1>
-    <p>To our amazing friend Dorm — we see you, we love you, and we’re incredibly proud of you. Coming out takes strength, and you've got it in spades.</p>
-    <p>Here's to living truthfully, loving freely, and always shining as your authentic self.</p>
-    
-    <div class="links">
-      <a href="https://t.me/coolnigga234" target="_blank">Telegram</a>
-   
+<canvas id="particles"></canvas>
+
+
+  <div id="enter-screen">
+    <div id="enter-text">click to enter.</div>
+  </div>
+
+
+    <div class="card top-card">
+      <img src="img/resist.png" alt="Dorm Profile Picture" class="profile-pic" />
+      <h1 class="username">Dorm</h1>
+      <p class="subtitle">i &lt;3 femboys</p>
+    </div>
+
+    <!-- MUSIC PLAYER CARD -->
+    <div class="card music-player-card">
+      <img id="music-image" src="img/songcover.jpg" alt="Music Cover" class="album-art" />
+      <div class="music-info">
+        <div id="song-title" class="song-title">Her</div>
+        <input type="range" id="progress-bar" min="0" max="100" value="0" />
+        <div class="volume-container">
+          <label for="volume-control">Volume</label>
+          <input type="range" id="volume-control" min="0" max="1" step="0.01" value="0.1" />
+        </div>
+        <div class="player-buttons">
+          <button id="prev-button" aria-label="Previous Song">Prev</button>
+          <button id="play-pause-button" aria-label="Play/Pause">Play</button>
+          <button id="next-button" aria-label="Next Song">Next</button>
+        </div>
+      </div>
+      <audio id="music-player" preload="auto"></audio>
+    </div>
+
+    <!-- DROPDOWN LINKS -->
+    <div class="card dropdown-container">
+      <div class="dropdown-item">
+        <div class="dropdown-header clickable">Telegram</div>
+        <div class="dropdown-content">
+          <img src="telegram-icon.png" alt="Telegram Icon" class="link-icon" />
+          <a href="https://t.me/coolnigga234" target="_blank" rel="noopener noreferrer">Telegram</a>
+        </div>
+      </div>
+
+      <div class="dropdown-item">
+        <div class="dropdown-header clickable">Doxbin</div>
+        <div class="dropdown-content">
+          <img src="doxbin-icon.png" alt="Doxbin Icon" class="link-icon" />
+          <a href="https://doxbin.net/user/wghwihgwehiug" target="_blank" rel="noopener noreferrer">Doxbin</a>
+        </div>
+      </div>
+
+      <div class="dropdown-item">
+        <div class="dropdown-header clickable">Discord</div>
+        <div class="dropdown-content">
+          <img src="discord-icon.png" alt="Discord Icon" class="link-icon" />
+          <a href="https://discord.gg/TbmnpFCP" target="_blank" rel="noopener noreferrer">Discord</a>
+        </div>
+      </div>
     </div>
   </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
