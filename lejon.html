@@ -1,28 +1,47 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Lion & Zebras Game</title>
-  <style>
-    body {
-      background: #222;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    canvas {
-      background: #111;
-      border: 2px solid #fff;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Lion & Zebras Game</title>
+<style>
+  body {
+    margin: 0;
+    background: linear-gradient(#f4c542, #d99a2b);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    color: #222;
+  }
+  canvas {
+    border: 3px solid #333;
+    background: #f7d26a;
+  }
+  #startScreen {
+    position: absolute;
+    text-align: center;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    border: none;
+    background: #333;
+    color: white;
+    border-radius: 8px;
+  }
+</style>
 </head>
 <body>
-<canvas id="game" width="400" height="400"></canvas>
+
+<div id="startScreen">
+  <h1>🦁 Sahara Hunt</h1>
+  <p>Eat zebras 🦓 and grow!</p>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<canvas id="game" width="400" height="400" style="display:none;"></canvas>
 
 <script>
 const canvas = document.getElementById('game');
@@ -30,37 +49,70 @@ const ctx = canvas.getContext('2d');
 
 const grid = 20;
 let count = 0;
+let score = 0;
+let gameRunning = false;
 
-let lion = {
-  x: 160,
-  y: 160,
-  dx: grid,
-  dy: 0,
-  cells: [],
-  maxCells: 4
-};
+let lion, zebra;
 
-let zebra = {
-  x: 320,
-  y: 320
-};
+function init() {
+  lion = {
+    x: 160,
+    y: 160,
+    dx: grid,
+    dy: 0,
+    cells: [],
+    maxCells: 4
+  };
+
+  zebra = {
+    x: 320,
+    y: 320
+  };
+
+  score = 0;
+}
+
+function startGame() {
+  document.getElementById('startScreen').style.display = 'none';
+  canvas.style.display = 'block';
+  init();
+  gameRunning = true;
+}
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+function drawBackground() {
+  // sand
+  ctx.fillStyle = '#f7d26a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // simple trees
+  for (let i = 0; i < 5; i++) {
+    let x = i * 80 + 20;
+    ctx.fillStyle = '#8b5a2b';
+    ctx.fillRect(x, 300, 10, 40);
+
+    ctx.fillStyle = 'green';
+    ctx.beginPath();
+    ctx.arc(x + 5, 290, 15, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
 function loop() {
   requestAnimationFrame(loop);
+  if (!gameRunning) return;
 
   if (++count < 4) return;
   count = 0;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBackground();
 
   lion.x += lion.dx;
   lion.y += lion.dy;
 
-  // wrap around screen
   if (lion.x < 0) lion.x = canvas.width - grid;
   else if (lion.x >= canvas.width) lion.x = 0;
 
@@ -73,49 +125,48 @@ function loop() {
     lion.cells.pop();
   }
 
-  // draw zebra (food)
-  ctx.fillStyle = 'white';
-  ctx.fillRect(zebra.x, zebra.y, grid-2, grid-2);
+  // draw zebra 🦓
+  ctx.font = '18px Arial';
+  ctx.fillText('🦓', zebra.x, zebra.y + 15);
 
-  // zebra stripes
-  ctx.fillStyle = 'black';
-  for (let i = 0; i < 3; i++) {
-    ctx.fillRect(zebra.x + i*6, zebra.y, 2, grid-2);
-  }
-
-  // draw lion (snake body)
   lion.cells.forEach(function(cell, index) {
+    // draw lion body
     ctx.fillStyle = 'orange';
-    ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
+    ctx.fillRect(cell.x, cell.y, grid-2, grid-2);
 
-    // head (bigger)
+    // head 🦁
     if (index === 0) {
-      ctx.fillStyle = 'gold';
-      ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
+      ctx.font = '18px Arial';
+      ctx.fillText('🦁', cell.x, cell.y + 15);
     }
 
     // eat zebra
     if (cell.x === zebra.x && cell.y === zebra.y) {
       lion.maxCells++;
+      score++;
       zebra.x = getRandomInt(0, 20) * grid;
       zebra.y = getRandomInt(0, 20) * grid;
     }
 
-    // collision with itself = reset
+    // self collision
     for (let i = index + 1; i < lion.cells.length; i++) {
       if (cell.x === lion.cells[i].x && cell.y === lion.cells[i].y) {
-        lion.x = 160;
-        lion.y = 160;
-        lion.cells = [];
-        lion.maxCells = 4;
-        lion.dx = grid;
-        lion.dy = 0;
+        gameRunning = false;
+        alert('Game Over! Score: ' + score);
+        document.getElementById('startScreen').style.display = 'block';
+        canvas.style.display = 'none';
       }
     }
   });
+
+  // draw score
+  ctx.fillStyle = '#222';
+  ctx.font = '16px Arial';
+  ctx.fillText('Score: ' + score, 10, 20);
 }
 
 // controls
+
 document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowLeft' && lion.dx === 0) {
     lion.dx = -grid;
