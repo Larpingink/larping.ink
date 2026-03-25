@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sahara Hunt</title>
+<title>Damiens Sahara spel</title>
 <style>
   body {
     margin: 0;
@@ -15,26 +15,27 @@
   }
   canvas {
     border-radius: 16px;
-    box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+    box-shadow: 0 25px 70px rgba(0,0,0,0.7);
+    background: linear-gradient(#f7d26a, #c98e2b);
   }
   .panel {
     position: absolute;
     text-align: center;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.4);
   }
   button, select {
-    margin: 8px;
-    padding: 10px 14px;
-    font-size: 16px;
-    border-radius: 10px;
+    margin: 10px;
+    padding: 12px 18px;
+    font-size: 18px;
+    border-radius: 12px;
     border: none;
     cursor: pointer;
   }
-  h1 { margin: 0 0 10px; }
+  h1 { margin: 0 0 15px; }
   .hidden { display:none; }
 </style>
 </head>
@@ -42,12 +43,12 @@
 
 <div id="startScreen" class="panel">
   <h1>🌵 Sahara Hunt</h1>
-  <p>Choose your hunt</p>
+  <p>Välj ditt djur för att jaga! </p>
 
   <div>
     <label>Animal:</label>
     <select id="animalSelect">
-      <option value="lion">🦁 Lion</option>
+      <option value="lion">🦁 Lejon</option>
       <option value="tiger">🐯 Tiger</option>
     </select>
   </div>
@@ -81,27 +82,21 @@
   <button onclick="goToMenu()">🏠 Main Menu</button>
 </div>
 
-<canvas id="game" width="500" height="500" class="hidden"></canvas>
+<canvas id="game" width="600" height="600" class="hidden"></canvas>
 
 <script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-
 const grid = 20;
-let count = 0;
-let score = 0;
-let best = localStorage.getItem('saharaBest') || 0;
-let speed = 4;
-let gameRunning = false;
-let zebras = [];
-let playerEmoji = '🦁';
-let lion;
+let count = 0, score = 0, best = localStorage.getItem('saharaBest') || 0, speed = 4;
+let gameRunning = false, zebras = [];
+let playerEmoji = '🦁', lion;
 
 function init(zebraNum) {
-  lion = { x: 200, y: 200, dx: grid, dy: 0, cells: [], maxCells: 4 };
+  lion = { x: 300, y: 300, dx: grid, dy: 0, cells: [], maxCells: 4 };
   zebras = [];
   for (let i = 0; i < zebraNum; i++) {
-    zebras.push({ x: Math.floor(Math.random()*25)*grid, y: Math.floor(Math.random()*25)*grid });
+    zebras.push({ x: Math.floor(Math.random()*30)*grid, y: Math.floor(Math.random()*30)*grid });
   }
   score = 0;
 }
@@ -117,108 +112,79 @@ function startGame() {
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('gameOverScreen').classList.add('hidden');
   canvas.classList.remove('hidden');
-
   init(zebraNum);
   gameRunning = true;
 }
 
 function endGame() {
   gameRunning = false;
-  if (score > best) {
-    best = score;
-    localStorage.setItem('saharaBest', best);
-  }
+  if (score > best) { best = score; localStorage.setItem('saharaBest', best); }
   document.getElementById('finalScore').innerText = 'Score: ' + score;
   document.getElementById('bestScore').innerText = 'Best: ' + best;
-
   document.getElementById('gameOverScreen').classList.remove('hidden');
   canvas.classList.add('hidden');
 }
 
-function restartGame() {
-  document.getElementById('gameOverScreen').classList.add('hidden');
-  startGame();
-}
-
-function goToMenu() {
-  document.getElementById('gameOverScreen').classList.add('hidden');
-  document.getElementById('startScreen').classList.remove('hidden');
-}
+function restartGame() { document.getElementById('gameOverScreen').classList.add('hidden'); startGame(); }
+function goToMenu() { document.getElementById('gameOverScreen').classList.add('hidden'); document.getElementById('startScreen').classList.remove('hidden'); }
 
 function drawBackground() {
   const grad = ctx.createLinearGradient(0,0,0,canvas.height);
-  grad.addColorStop(0, '#f7d26a');
+  grad.addColorStop(0, '#ffe08c');
   grad.addColorStop(1, '#c98e2b');
   ctx.fillStyle = grad;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  ctx.fillStyle = 'rgba(255,255,255,0.05)';
-  for (let i=0;i<10;i++) ctx.fillRect(0,i*50,canvas.width,10);
-
+  // dunes
   ctx.fillStyle = 'rgba(0,0,0,0.08)';
-  ctx.beginPath();
-  ctx.moveTo(0,300);
-  ctx.quadraticCurveTo(250,260,500,300);
-  ctx.lineTo(500,500);
-  ctx.lineTo(0,500);
-  ctx.fill();
+  ctx.beginPath(); ctx.moveTo(0,400); ctx.quadraticCurveTo(300,350,600,400); ctx.lineTo(600,600); ctx.lineTo(0,600); ctx.fill();
+
+  // scattered trees
+  for(let i=0;i<20;i++){
+    let x=Math.random()*canvas.width; let y=350+Math.random()*60;
+    ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(x+5,y+35,14,6,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#6b3e1f'; ctx.fillRect(x,y,10,35);
+    ctx.fillStyle='#2e8b57'; ctx.beginPath(); ctx.arc(x+5,y,16,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#3aa76d'; ctx.beginPath(); ctx.arc(x+5,y-5,10,0,Math.PI*2); ctx.fill();
+  }
 }
 
 function loop() {
   requestAnimationFrame(loop);
-  if (!gameRunning) return;
-
-  if (++count < speed) return;
-  count = 0;
+  if(!gameRunning) return;
+  if(++count<speed) return; count=0;
 
   drawBackground();
 
-  lion.x += lion.dx;
-  lion.y += lion.dy;
+  lion.x+=lion.dx; lion.y+=lion.dy;
+  if(lion.x<0) lion.x=canvas.width-grid; else if(lion.x>=canvas.width) lion.x=0;
+  if(lion.y<0) lion.y=canvas.height-grid; else if(lion.y>=canvas.height) lion.y=0;
+  lion.cells.unshift({x:lion.x,y:lion.y}); if(lion.cells.length>lion.maxCells) lion.cells.pop();
 
-  if (lion.x < 0) lion.x = canvas.width - grid;
-  else if (lion.x >= canvas.width) lion.x = 0;
-  if (lion.y < 0) lion.y = canvas.height - grid;
-  else if (lion.y >= canvas.height) lion.y = 0;
+  // draw zebras
+  ctx.font='22px Arial';
+  zebras.forEach(z=>{ctx.fillStyle='rgba(0,0,0,0.4)';ctx.fillText('🦓',z.x+2,z.y+18);ctx.fillStyle='#000';ctx.fillText('🦓',z.x,z.y+15);});
 
-  lion.cells.unshift({ x: lion.x, y: lion.y });
-  if (lion.cells.length > lion.maxCells) lion.cells.pop();
+  // draw lion/tiger
+  lion.cells.forEach((cell,index)=>{
+    ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.fillRect(cell.x+2,cell.y+2,grid-2,grid-2);
+    ctx.fillStyle='orange'; ctx.fillRect(cell.x,cell.y,grid-2,grid-2);
+    if(index===0) ctx.fillText(playerEmoji,cell.x,cell.y+18);
 
-  ctx.font = '18px Arial';
-  zebras.forEach(z => ctx.fillText('🦓', z.x, z.y+15));
-
-  lion.cells.forEach((cell, index) => {
-    ctx.fillStyle = 'orange';
-    ctx.fillRect(cell.x, cell.y, grid-2, grid-2);
-    if (index===0) ctx.fillText(playerEmoji, cell.x, cell.y+15);
-
-    zebras.forEach((z,zi)=>{
-      if (cell.x===z.x && cell.y===z.y) {
-        lion.maxCells++; score++;
-        zebras[zi] = { x: Math.floor(Math.random()*25)*grid, y: Math.floor(Math.random()*25)*grid };
-      }
-    });
-
-    for (let i=index+1;i<lion.cells.length;i++) {
-      if (cell.x===lion.cells[i].x && cell.y===lion.cells[i].y) endGame();
-    }
+    zebras.forEach((z,zi)=>{ if(cell.x===z.x && cell.y===z.y){ lion.maxCells++; score++; zebras[zi]={x:Math.floor(Math.random()*30)*grid,y:Math.floor(Math.random()*30)*grid}; } });
+    for(let i=index+1;i<lion.cells.length;i++){ if(cell.x===lion.cells[i].x && cell.y===lion.cells[i].y) endGame(); }
   });
 
-  ctx.fillStyle = '#222';
-  ctx.font = '20px Arial';
-  ctx.fillText('Score: '+score, 10, 25);
+  ctx.fillStyle='#222'; ctx.font='22px Arial'; ctx.fillText('Score: '+score,10,30);
 }
 
-// controls
-
-document.addEventListener('keydown', e => {
-  if (!lion) return;
-  if (e.key==='ArrowLeft' && lion.dx===0) { lion.dx=-grid; lion.dy=0; }
-  else if (e.key==='ArrowUp' && lion.dy===0) { lion.dy=-grid; lion.dx=0; }
-  else if (e.key==='ArrowRight' && lion.dx===0) { lion.dx=grid; lion.dy=0; }
-  else if (e.key==='ArrowDown' && lion.dy===0) { lion.dy=grid; lion.dx=0; }
+document.addEventListener('keydown',e=>{
+  if(!lion)return;
+  if(e.key==='ArrowLeft'&&lion.dx===0){lion.dx=-grid;lion.dy=0;}
+  else if(e.key==='ArrowUp'&&lion.dy===0){lion.dy=-grid;lion.dx=0;}
+  else if(e.key==='ArrowRight'&&lion.dx===0){lion.dx=grid;lion.dy=0;}
+  else if(e.key==='ArrowDown'&&lion.dy===0){lion.dy=grid;lion.dx=0;}
 });
-
 requestAnimationFrame(loop);
 </script>
 </body>
