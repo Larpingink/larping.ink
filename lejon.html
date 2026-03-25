@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Damiens Hunt</title>
+<title>Sahara Hunt</title>
 <style>
   body {
     margin: 0;
@@ -14,27 +14,35 @@
     font-family: Arial;
   }
   canvas {
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border-radius: 16px;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.6);
   }
-  #startScreen {
+  .panel {
     position: absolute;
     text-align: center;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   }
   button, select {
     margin: 8px;
-    padding: 10px;
+    padding: 10px 14px;
     font-size: 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     border: none;
+    cursor: pointer;
   }
+  h1 { margin: 0 0 10px; }
+  .hidden { display:none; }
 </style>
 </head>
 <body>
 
-<div id="startScreen">
+<div id="startScreen" class="panel">
   <h1>🌵 Sahara Hunt</h1>
-  <p>Choose your predator & prey</p>
+  <p>Choose your hunt</p>
 
   <div>
     <label>Animal:</label>
@@ -53,10 +61,27 @@
     </select>
   </div>
 
-  <button onclick="startGame()">Start Game</button>
+  <div>
+    <label>Difficulty:</label>
+    <select id="difficulty">
+      <option value="slow">🟢 Easy</option>
+      <option value="normal">🟡 Normal</option>
+      <option value="fast">🔴 Hard</option>
+    </select>
+  </div>
+
+  <button onclick="startGame()">▶ Start Hunt</button>
 </div>
 
-<canvas id="game" width="500" height="500" style="display:none;"></canvas>
+<div id="gameOverScreen" class="panel hidden">
+  <h1>💀 Game Over</h1>
+  <p id="finalScore"></p>
+  <p id="bestScore"></p>
+  <button onclick="restartGame()">🔁 Play Again</button>
+  <button onclick="goToMenu()">🏠 Main Menu</button>
+</div>
+
+<canvas id="game" width="500" height="500" class="hidden"></canvas>
 
 <script>
 const canvas = document.getElementById('game');
@@ -65,60 +90,71 @@ const ctx = canvas.getContext('2d');
 const grid = 20;
 let count = 0;
 let score = 0;
+let best = localStorage.getItem('saharaBest') || 0;
+let speed = 4;
 let gameRunning = false;
 let zebras = [];
 let playerEmoji = '🦁';
 let lion;
 
 function init(zebraNum) {
-  lion = {
-    x: 200,
-    y: 200,
-    dx: grid,
-    dy: 0,
-    cells: [],
-    maxCells: 4
-  };
-
+  lion = { x: 200, y: 200, dx: grid, dy: 0, cells: [], maxCells: 4 };
   zebras = [];
   for (let i = 0; i < zebraNum; i++) {
-    zebras.push({
-      x: Math.floor(Math.random() * 25) * grid,
-      y: Math.floor(Math.random() * 25) * grid
-    });
+    zebras.push({ x: Math.floor(Math.random()*25)*grid, y: Math.floor(Math.random()*25)*grid });
   }
-
   score = 0;
 }
 
 function startGame() {
-  const zebraNum = parseInt(document.getElementById('zebraCount').value);
+  const zebraNum = +document.getElementById('zebraCount').value;
   const animal = document.getElementById('animalSelect').value;
+  const diff = document.getElementById('difficulty').value;
 
   playerEmoji = animal === 'lion' ? '🦁' : '🐯';
+  speed = diff === 'slow' ? 6 : diff === 'normal' ? 4 : 2;
 
-  document.getElementById('startScreen').style.display = 'none';
-  canvas.style.display = 'block';
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('gameOverScreen').classList.add('hidden');
+  canvas.classList.remove('hidden');
 
   init(zebraNum);
   gameRunning = true;
 }
 
+function endGame() {
+  gameRunning = false;
+  if (score > best) {
+    best = score;
+    localStorage.setItem('saharaBest', best);
+  }
+  document.getElementById('finalScore').innerText = 'Score: ' + score;
+  document.getElementById('bestScore').innerText = 'Best: ' + best;
+
+  document.getElementById('gameOverScreen').classList.remove('hidden');
+  canvas.classList.add('hidden');
+}
+
+function restartGame() {
+  document.getElementById('gameOverScreen').classList.add('hidden');
+  startGame();
+}
+
+function goToMenu() {
+  document.getElementById('gameOverScreen').classList.add('hidden');
+  document.getElementById('startScreen').classList.remove('hidden');
+}
+
 function drawBackground() {
-  // sand gradient base
   const grad = ctx.createLinearGradient(0,0,0,canvas.height);
   grad.addColorStop(0, '#f7d26a');
   grad.addColorStop(1, '#c98e2b');
   ctx.fillStyle = grad;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // heat haze overlay
   ctx.fillStyle = 'rgba(255,255,255,0.05)';
-  for (let i = 0; i < 10; i++) {
-    ctx.fillRect(0, i*50, canvas.width, 10);
-  }
+  for (let i=0;i<10;i++) ctx.fillRect(0,i*50,canvas.width,10);
 
-  // dunes (soft curves)
   ctx.fillStyle = 'rgba(0,0,0,0.08)';
   ctx.beginPath();
   ctx.moveTo(0,300);
@@ -126,40 +162,13 @@ function drawBackground() {
   ctx.lineTo(500,500);
   ctx.lineTo(0,500);
   ctx.fill();
-
-  // better trees
-  for (let i = 0; i < 15; i++) {
-    let x = (i * 37 + i*13) % canvas.width;
-    let y = 320 + (i % 4) * 15;
-
-    // shadow blur
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
-    ctx.beginPath();
-    ctx.ellipse(x+6, y+42, 14, 6, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // trunk
-    ctx.fillStyle = '#6b3e1f';
-    ctx.fillRect(x, y, 10, 35);
-
-    // layered leaves
-    ctx.fillStyle = '#2e8b57';
-    ctx.beginPath();
-    ctx.arc(x+5, y, 16, 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle = '#3aa76d';
-    ctx.beginPath();
-    ctx.arc(x+5, y-5, 10, 0, Math.PI*2);
-    ctx.fill();
-  }
 }
 
 function loop() {
   requestAnimationFrame(loop);
   if (!gameRunning) return;
 
-  if (++count < 4) return;
+  if (++count < speed) return;
   count = 0;
 
   drawBackground();
@@ -169,85 +178,45 @@ function loop() {
 
   if (lion.x < 0) lion.x = canvas.width - grid;
   else if (lion.x >= canvas.width) lion.x = 0;
-
   if (lion.y < 0) lion.y = canvas.height - grid;
   else if (lion.y >= canvas.height) lion.y = 0;
 
   lion.cells.unshift({ x: lion.x, y: lion.y });
+  if (lion.cells.length > lion.maxCells) lion.cells.pop();
 
-  if (lion.cells.length > lion.maxCells) {
-    lion.cells.pop();
-  }
-
-  // zebras with shadow
   ctx.font = '18px Arial';
-  zebras.forEach(z => {
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fillText('🦓', z.x+2, z.y+18);
-    ctx.fillStyle = '#000';
-    ctx.fillText('🦓', z.x, z.y+15);
-  });
+  zebras.forEach(z => ctx.fillText('🦓', z.x, z.y+15));
 
-  lion.cells.forEach(function(cell, index) {
-    // body shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.2)';
-    ctx.fillRect(cell.x+2, cell.y+2, grid-2, grid-2);
-
+  lion.cells.forEach((cell, index) => {
     ctx.fillStyle = 'orange';
     ctx.fillRect(cell.x, cell.y, grid-2, grid-2);
+    if (index===0) ctx.fillText(playerEmoji, cell.x, cell.y+15);
 
-    if (index === 0) {
-      ctx.fillText(playerEmoji, cell.x, cell.y + 15);
-    }
-
-    zebras.forEach((z, zi) => {
-      if (cell.x === z.x && cell.y === z.y) {
-        lion.maxCells++;
-        score++;
-        zebras[zi] = {
-          x: Math.floor(Math.random() * 25) * grid,
-          y: Math.floor(Math.random() * 25) * grid
-        };
+    zebras.forEach((z,zi)=>{
+      if (cell.x===z.x && cell.y===z.y) {
+        lion.maxCells++; score++;
+        zebras[zi] = { x: Math.floor(Math.random()*25)*grid, y: Math.floor(Math.random()*25)*grid };
       }
     });
 
-    for (let i = index + 1; i < lion.cells.length; i++) {
-      if (cell.x === lion.cells[i].x && cell.y === lion.cells[i].y) {
-        gameRunning = false;
-        alert('Game Over! Score: ' + score);
-        document.getElementById('startScreen').style.display = 'block';
-        canvas.style.display = 'none';
-      }
+    for (let i=index+1;i<lion.cells.length;i++) {
+      if (cell.x===lion.cells[i].x && cell.y===lion.cells[i].y) endGame();
     }
   });
 
-  // glowing score
   ctx.fillStyle = '#222';
   ctx.font = '20px Arial';
-  ctx.shadowColor = 'rgba(0,0,0,0.5)';
-  ctx.shadowBlur = 5;
-  ctx.fillText('Score: ' + score, 10, 25);
-  ctx.shadowBlur = 0;
+  ctx.fillText('Score: '+score, 10, 25);
 }
 
 // controls
 
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', e => {
   if (!lion) return;
-
-  if (e.key === 'ArrowLeft' && lion.dx === 0) {
-    lion.dx = -grid;
-    lion.dy = 0;
-  } else if (e.key === 'ArrowUp' && lion.dy === 0) {
-    lion.dy = -grid;
-    lion.dx = 0;
-  } else if (e.key === 'ArrowRight' && lion.dx === 0) {
-    lion.dx = grid;
-    lion.dy = 0;
-  } else if (e.key === 'ArrowDown' && lion.dy === 0) {
-    lion.dy = grid;
-    lion.dx = 0;
-  }
+  if (e.key==='ArrowLeft' && lion.dx===0) { lion.dx=-grid; lion.dy=0; }
+  else if (e.key==='ArrowUp' && lion.dy===0) { lion.dy=-grid; lion.dx=0; }
+  else if (e.key==='ArrowRight' && lion.dx===0) { lion.dx=grid; lion.dy=0; }
+  else if (e.key==='ArrowDown' && lion.dy===0) { lion.dy=grid; lion.dx=0; }
 });
 
 requestAnimationFrame(loop);
