@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>damiens sahara spel</title>
+<title>Damiens Hunt</title>
 <style>
   body {
     margin: 0;
-    background: linear-gradient(#f7c873, #c98e2b);
+    background: radial-gradient(circle at top, #ffd27a, #c98e2b);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,8 +14,8 @@
     font-family: Arial;
   }
   canvas {
-    border: 3px solid #333;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   }
   #startScreen {
     position: absolute;
@@ -68,7 +68,6 @@ let score = 0;
 let gameRunning = false;
 let zebras = [];
 let playerEmoji = '🦁';
-
 let lion;
 
 function init(zebraNum) {
@@ -106,32 +105,52 @@ function startGame() {
 }
 
 function drawBackground() {
-  // sand gradient
+  // sand gradient base
   const grad = ctx.createLinearGradient(0,0,0,canvas.height);
   grad.addColorStop(0, '#f7d26a');
-  grad.addColorStop(1, '#d99a2b');
+  grad.addColorStop(1, '#c98e2b');
   ctx.fillStyle = grad;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // scattered trees
-  for (let i = 0; i < 12; i++) {
-    let x = (i * 40 + (i%3)*15) % canvas.width;
-    let y = 350 + (i%5)*5;
+  // heat haze overlay
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  for (let i = 0; i < 10; i++) {
+    ctx.fillRect(0, i*50, canvas.width, 10);
+  }
 
-    // shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  // dunes (soft curves)
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.beginPath();
+  ctx.moveTo(0,300);
+  ctx.quadraticCurveTo(250,260,500,300);
+  ctx.lineTo(500,500);
+  ctx.lineTo(0,500);
+  ctx.fill();
+
+  // better trees
+  for (let i = 0; i < 15; i++) {
+    let x = (i * 37 + i*13) % canvas.width;
+    let y = 320 + (i % 4) * 15;
+
+    // shadow blur
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
     ctx.beginPath();
-    ctx.ellipse(x+5, y+45, 12, 5, 0, 0, Math.PI*2);
+    ctx.ellipse(x+6, y+42, 14, 6, 0, 0, Math.PI*2);
     ctx.fill();
 
     // trunk
-    ctx.fillStyle = '#8b5a2b';
-    ctx.fillRect(x, y, 8, 35);
+    ctx.fillStyle = '#6b3e1f';
+    ctx.fillRect(x, y, 10, 35);
 
-    // leaves
+    // layered leaves
     ctx.fillStyle = '#2e8b57';
     ctx.beginPath();
-    ctx.arc(x+4, y, 14, 0, Math.PI*2);
+    ctx.arc(x+5, y, 16, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = '#3aa76d';
+    ctx.beginPath();
+    ctx.arc(x+5, y-5, 10, 0, Math.PI*2);
     ctx.fill();
   }
 }
@@ -160,13 +179,20 @@ function loop() {
     lion.cells.pop();
   }
 
-  // draw zebras
+  // zebras with shadow
   ctx.font = '18px Arial';
   zebras.forEach(z => {
-    ctx.fillText('🦓', z.x, z.y + 15);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillText('🦓', z.x+2, z.y+18);
+    ctx.fillStyle = '#000';
+    ctx.fillText('🦓', z.x, z.y+15);
   });
 
   lion.cells.forEach(function(cell, index) {
+    // body shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fillRect(cell.x+2, cell.y+2, grid-2, grid-2);
+
     ctx.fillStyle = 'orange';
     ctx.fillRect(cell.x, cell.y, grid-2, grid-2);
 
@@ -174,7 +200,6 @@ function loop() {
       ctx.fillText(playerEmoji, cell.x, cell.y + 15);
     }
 
-    // eating multiple zebras
     zebras.forEach((z, zi) => {
       if (cell.x === z.x && cell.y === z.y) {
         lion.maxCells++;
@@ -186,7 +211,6 @@ function loop() {
       }
     });
 
-    // self collision
     for (let i = index + 1; i < lion.cells.length; i++) {
       if (cell.x === lion.cells[i].x && cell.y === lion.cells[i].y) {
         gameRunning = false;
@@ -197,10 +221,13 @@ function loop() {
     }
   });
 
-  // score
+  // glowing score
   ctx.fillStyle = '#222';
-  ctx.font = '18px Arial';
+  ctx.font = '20px Arial';
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 5;
   ctx.fillText('Score: ' + score, 10, 25);
+  ctx.shadowBlur = 0;
 }
 
 // controls
