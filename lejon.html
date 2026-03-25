@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
 <meta charset="UTF-8">
-<title>Damiens Sahara spel</title>
+<title>Sahara Hunt Advanced</title>
 <style>
   body {
     margin: 0;
@@ -11,42 +11,45 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: Arial;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
   }
   canvas {
     border-radius: 16px;
-    box-shadow: 0 25px 70px rgba(0,0,0,0.7);
+    box-shadow: 0 25px 80px rgba(0,0,0,0.7);
     background: linear-gradient(#f7d26a, #c98e2b);
   }
   .panel {
     position: absolute;
     text-align: center;
     background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(12px);
-    padding: 30px;
-    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    padding: 35px;
+    border-radius: 22px;
     box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+    width: 320px;
   }
-  button, select {
+  button, select, input[type='color'] {
     margin: 10px;
     padding: 12px 18px;
-    font-size: 18px;
+    font-size: 16px;
     border-radius: 12px;
     border: none;
     cursor: pointer;
   }
-  h1 { margin: 0 0 15px; }
+  h1 { margin: 0 0 15px; color: #222; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+  p { margin: 5px 0; }
   .hidden { display:none; }
+  .scoreboard { position: absolute; top: 10px; left: 10px; font-size: 20px; color: #222; text-shadow: 2px 2px 4px rgba(255,255,255,0.7); }
 </style>
 </head>
 <body>
 
 <div id="startScreen" class="panel">
   <h1>🌵 Sahara Hunt</h1>
-  <p>Välj ditt djur för att jaga! </p>
-
+  <p>Välj dina inställningar</p>
   <div>
-    <label>Animal:</label>
+    <label Rovdjur:</label>
     <select id="animalSelect">
       <option value="lion">🦁 Lejon</option>
       <option value="tiger">🐯 Tiger</option>
@@ -54,8 +57,8 @@
   </div>
 
   <div>
-    <label>Zebras:</label>
-    <select id="zebraCount">
+    <label>Antal potatisar (mat):</label>
+    <select id="foodCount">
       <option value="1">1</option>
       <option value="3">3</option>
       <option value="5">5</option>
@@ -63,25 +66,36 @@
   </div>
 
   <div>
-    <label>Difficulty:</label>
+    <label>Mat-ikon:</label>
+    <input type="text" id="foodIcon" value="🥔" maxlength="2">
+  </div>
+
+  <div>
+    <label>Svårighetsgrad:</label>
     <select id="difficulty">
-      <option value="slow">🟢 Easy</option>
+      <option value="easy">🟢 Lätt</option>
       <option value="normal">🟡 Normal</option>
-      <option value="fast">🔴 Hard</option>
+      <option value="hard">🔴 Svår</option>
     </select>
   </div>
 
-  <button onclick="startGame()">▶ Start Hunt</button>
+  <div>
+    <label>Bakgrundsfärg:</label>
+    <input type="color" id="bgColor" value="#f7d26a">
+  </div>
+
+  <button onclick="startGame()">▶ Starta Spelet</button>
 </div>
 
 <div id="gameOverScreen" class="panel hidden">
-  <h1>💀 Game Over</h1>
+  <h1>💀 Spelet Är Slut</h1>
   <p id="finalScore"></p>
   <p id="bestScore"></p>
-  <button onclick="restartGame()">🔁 Play Again</button>
-  <button onclick="goToMenu()">🏠 Main Menu</button>
+  <button onclick="restartGame()">🔁 Spela Igen</button>
+  <button onclick="goToMenu()">🏠 Huvudmeny</button>
 </div>
 
+<div class="scoreboard" id="scoreboard">Poäng: 0</div>
 <canvas id="game" width="600" height="600" class="hidden"></canvas>
 
 <script>
@@ -89,59 +103,63 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const grid = 20;
 let count = 0, score = 0, best = localStorage.getItem('saharaBest') || 0, speed = 4;
-let gameRunning = false, zebras = [];
-let playerEmoji = '🦁', lion;
+let gameRunning = false, foodItems = [];
+let playerEmoji = '🦁', foodEmoji = '🥔', lion;
 
-function init(zebraNum) {
+function init(foodNum) {
   lion = { x: 300, y: 300, dx: grid, dy: 0, cells: [], maxCells: 4 };
-  zebras = [];
-  for (let i = 0; i < zebraNum; i++) {
-    zebras.push({ x: Math.floor(Math.random()*30)*grid, y: Math.floor(Math.random()*30)*grid });
+  foodItems = [];
+  for (let i = 0; i < foodNum; i++) {
+    foodItems.push({ x: Math.floor(Math.random()*30)*grid, y: Math.floor(Math.random()*30)*grid });
   }
   score = 0;
+  updateScore();
 }
 
+function updateScore(){ document.getElementById('scoreboard').innerText = 'Poäng: ' + score; }
+
 function startGame() {
-  const zebraNum = +document.getElementById('zebraCount').value;
+  const foodNum = +document.getElementById('foodCount').value;
   const animal = document.getElementById('animalSelect').value;
   const diff = document.getElementById('difficulty').value;
+  const bg = document.getElementById('bgColor').value;
+  foodEmoji = document.getElementById('foodIcon').value || '🥔';
 
-  playerEmoji = animal === 'lion' ? '🦁' : '🐯';
-  speed = diff === 'slow' ? 6 : diff === 'normal' ? 4 : 2;
+  playerEmoji = animal==='lion'?'🦁':'🐯';
+  speed = diff==='easy'?6:diff==='normal'?4:2;
 
+  canvas.style.background = bg;
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('gameOverScreen').classList.add('hidden');
   canvas.classList.remove('hidden');
-  init(zebraNum);
+
+  init(foodNum);
   gameRunning = true;
 }
 
 function endGame() {
   gameRunning = false;
-  if (score > best) { best = score; localStorage.setItem('saharaBest', best); }
-  document.getElementById('finalScore').innerText = 'Score: ' + score;
-  document.getElementById('bestScore').innerText = 'Best: ' + best;
+  if(score>best){ best = score; localStorage.setItem('saharaBest', best); }
+  document.getElementById('finalScore').innerText='Poäng: '+score;
+  document.getElementById('bestScore').innerText='Bästa: '+best;
   document.getElementById('gameOverScreen').classList.remove('hidden');
   canvas.classList.add('hidden');
 }
 
-function restartGame() { document.getElementById('gameOverScreen').classList.add('hidden'); startGame(); }
-function goToMenu() { document.getElementById('gameOverScreen').classList.add('hidden'); document.getElementById('startScreen').classList.remove('hidden'); }
+function restartGame(){ document.getElementById('gameOverScreen').classList.add('hidden'); startGame(); }
+function goToMenu(){ document.getElementById('gameOverScreen').classList.add('hidden'); document.getElementById('startScreen').classList.remove('hidden'); }
 
-function drawBackground() {
+function drawBackground(){
   const grad = ctx.createLinearGradient(0,0,0,canvas.height);
-  grad.addColorStop(0, '#ffe08c');
-  grad.addColorStop(1, '#c98e2b');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  grad.addColorStop(0, canvas.style.background||'#ffe08c');
+  grad.addColorStop(1,'#c98e2b');
+  ctx.fillStyle=grad; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // dunes
-  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.fillStyle='rgba(0,0,0,0.08)';
   ctx.beginPath(); ctx.moveTo(0,400); ctx.quadraticCurveTo(300,350,600,400); ctx.lineTo(600,600); ctx.lineTo(0,600); ctx.fill();
 
-  // scattered trees
-  for(let i=0;i<20;i++){
-    let x=Math.random()*canvas.width; let y=350+Math.random()*60;
+  for(let i=0;i<25;i++){
+    let x=Math.random()*canvas.width, y=350+Math.random()*60;
     ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(x+5,y+35,14,6,0,0,Math.PI*2); ctx.fill();
     ctx.fillStyle='#6b3e1f'; ctx.fillRect(x,y,10,35);
     ctx.fillStyle='#2e8b57'; ctx.beginPath(); ctx.arc(x+5,y,16,0,Math.PI*2); ctx.fill();
@@ -149,33 +167,32 @@ function drawBackground() {
   }
 }
 
-function loop() {
-  requestAnimationFrame(loop);
-  if(!gameRunning) return;
+function spawnFoodEffect(x,y){
+  ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.beginPath(); ctx.arc(x+10,y+10,10,0,Math.PI*2); ctx.fill();
+}
+
+function loop(){
+  requestAnimationFrame(loop); if(!gameRunning) return;
   if(++count<speed) return; count=0;
 
   drawBackground();
-
   lion.x+=lion.dx; lion.y+=lion.dy;
   if(lion.x<0) lion.x=canvas.width-grid; else if(lion.x>=canvas.width) lion.x=0;
   if(lion.y<0) lion.y=canvas.height-grid; else if(lion.y>=canvas.height) lion.y=0;
   lion.cells.unshift({x:lion.x,y:lion.y}); if(lion.cells.length>lion.maxCells) lion.cells.pop();
 
-  // draw zebras
   ctx.font='22px Arial';
-  zebras.forEach(z=>{ctx.fillStyle='rgba(0,0,0,0.4)';ctx.fillText('🦓',z.x+2,z.y+18);ctx.fillStyle='#000';ctx.fillText('🦓',z.x,z.y+15);});
+  foodItems.forEach(f=>{ctx.fillStyle='rgba(0,0,0,0.4)';ctx.fillText(foodEmoji,f.x+2,f.y+18);ctx.fillStyle='#000';ctx.fillText(foodEmoji,f.x,f.y+15);});
 
-  // draw lion/tiger
   lion.cells.forEach((cell,index)=>{
     ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.fillRect(cell.x+2,cell.y+2,grid-2,grid-2);
     ctx.fillStyle='orange'; ctx.fillRect(cell.x,cell.y,grid-2,grid-2);
     if(index===0) ctx.fillText(playerEmoji,cell.x,cell.y+18);
 
-    zebras.forEach((z,zi)=>{ if(cell.x===z.x && cell.y===z.y){ lion.maxCells++; score++; zebras[zi]={x:Math.floor(Math.random()*30)*grid,y:Math.floor(Math.random()*30)*grid}; } });
+    foodItems.forEach((f,fi)=>{ if(cell.x===f.x && cell.y===f.y){ lion.maxCells++; score++; spawnFoodEffect(f.x,f.y); foodItems[fi]={x:Math.floor(Math.random()*30)*grid,y:Math.floor(Math.random()*30)*grid}; updateScore(); } });
     for(let i=index+1;i<lion.cells.length;i++){ if(cell.x===lion.cells[i].x && cell.y===lion.cells[i].y) endGame(); }
   });
-
-  ctx.fillStyle='#222'; ctx.font='22px Arial'; ctx.fillText('Score: '+score,10,30);
 }
 
 document.addEventListener('keydown',e=>{
