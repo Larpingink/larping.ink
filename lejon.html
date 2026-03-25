@@ -1,1 +1,138 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lion & Zebras Game</title>
+  <style>
+    body {
+      background: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      background: #111;
+      border: 2px solid #fff;
+    }
+  </style>
+</head>
+<body>
+<canvas id="game" width="400" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+const grid = 20;
+let count = 0;
+
+let lion = {
+  x: 160,
+  y: 160,
+  dx: grid,
+  dy: 0,
+  cells: [],
+  maxCells: 4
+};
+
+let zebra = {
+  x: 320,
+  y: 320
+};
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function loop() {
+  requestAnimationFrame(loop);
+
+  if (++count < 4) return;
+  count = 0;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  lion.x += lion.dx;
+  lion.y += lion.dy;
+
+  // wrap around screen
+  if (lion.x < 0) lion.x = canvas.width - grid;
+  else if (lion.x >= canvas.width) lion.x = 0;
+
+  if (lion.y < 0) lion.y = canvas.height - grid;
+  else if (lion.y >= canvas.height) lion.y = 0;
+
+  lion.cells.unshift({ x: lion.x, y: lion.y });
+
+  if (lion.cells.length > lion.maxCells) {
+    lion.cells.pop();
+  }
+
+  // draw zebra (food)
+  ctx.fillStyle = 'white';
+  ctx.fillRect(zebra.x, zebra.y, grid-2, grid-2);
+
+  // zebra stripes
+  ctx.fillStyle = 'black';
+  for (let i = 0; i < 3; i++) {
+    ctx.fillRect(zebra.x + i*6, zebra.y, 2, grid-2);
+  }
+
+  // draw lion (snake body)
+  lion.cells.forEach(function(cell, index) {
+    ctx.fillStyle = 'orange';
+    ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
+
+    // head (bigger)
+    if (index === 0) {
+      ctx.fillStyle = 'gold';
+      ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
+    }
+
+    // eat zebra
+    if (cell.x === zebra.x && cell.y === zebra.y) {
+      lion.maxCells++;
+      zebra.x = getRandomInt(0, 20) * grid;
+      zebra.y = getRandomInt(0, 20) * grid;
+    }
+
+    // collision with itself = reset
+    for (let i = index + 1; i < lion.cells.length; i++) {
+      if (cell.x === lion.cells[i].x && cell.y === lion.cells[i].y) {
+        lion.x = 160;
+        lion.y = 160;
+        lion.cells = [];
+        lion.maxCells = 4;
+        lion.dx = grid;
+        lion.dy = 0;
+      }
+    }
+  });
+}
+
+// controls
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft' && lion.dx === 0) {
+    lion.dx = -grid;
+    lion.dy = 0;
+  } else if (e.key === 'ArrowUp' && lion.dy === 0) {
+    lion.dy = -grid;
+    lion.dx = 0;
+  } else if (e.key === 'ArrowRight' && lion.dx === 0) {
+    lion.dx = grid;
+    lion.dy = 0;
+  } else if (e.key === 'ArrowDown' && lion.dy === 0) {
+    lion.dy = grid;
+    lion.dx = 0;
+  }
+});
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
