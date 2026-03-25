@@ -2,46 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lion & Zebras Game</title>
+<title>damiens sahara spel</title>
 <style>
   body {
     margin: 0;
-    background: linear-gradient(#f4c542, #d99a2b);
+    background: linear-gradient(#f7c873, #c98e2b);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: Arial, sans-serif;
-    color: #222;
+    font-family: Arial;
   }
   canvas {
     border: 3px solid #333;
-    background: #f7d26a;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   }
   #startScreen {
     position: absolute;
     text-align: center;
   }
-  button {
-    padding: 10px 20px;
-    font-size: 18px;
-    cursor: pointer;
-    border: none;
-    background: #333;
-    color: white;
+  button, select {
+    margin: 8px;
+    padding: 10px;
+    font-size: 16px;
     border-radius: 8px;
+    border: none;
   }
 </style>
 </head>
 <body>
 
 <div id="startScreen">
-  <h1>🦁 Sahara Hunt</h1>
-  <p>Eat zebras 🦓 and grow!</p>
+  <h1>🌵 Sahara Hunt</h1>
+  <p>Choose your predator & prey</p>
+
+  <div>
+    <label>Animal:</label>
+    <select id="animalSelect">
+      <option value="lion">🦁 Lion</option>
+      <option value="tiger">🐯 Tiger</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Zebras:</label>
+    <select id="zebraCount">
+      <option value="1">1</option>
+      <option value="3">3</option>
+      <option value="5">5</option>
+    </select>
+  </div>
+
   <button onclick="startGame()">Start Game</button>
 </div>
 
-<canvas id="game" width="400" height="400" style="display:none;"></canvas>
+<canvas id="game" width="500" height="500" style="display:none;"></canvas>
 
 <script>
 const canvas = document.getElementById('game');
@@ -51,52 +66,72 @@ const grid = 20;
 let count = 0;
 let score = 0;
 let gameRunning = false;
+let zebras = [];
+let playerEmoji = '🦁';
 
-let lion, zebra;
+let lion;
 
-function init() {
+function init(zebraNum) {
   lion = {
-    x: 160,
-    y: 160,
+    x: 200,
+    y: 200,
     dx: grid,
     dy: 0,
     cells: [],
     maxCells: 4
   };
 
-  zebra = {
-    x: 320,
-    y: 320
-  };
+  zebras = [];
+  for (let i = 0; i < zebraNum; i++) {
+    zebras.push({
+      x: Math.floor(Math.random() * 25) * grid,
+      y: Math.floor(Math.random() * 25) * grid
+    });
+  }
 
   score = 0;
 }
 
 function startGame() {
+  const zebraNum = parseInt(document.getElementById('zebraCount').value);
+  const animal = document.getElementById('animalSelect').value;
+
+  playerEmoji = animal === 'lion' ? '🦁' : '🐯';
+
   document.getElementById('startScreen').style.display = 'none';
   canvas.style.display = 'block';
-  init();
+
+  init(zebraNum);
   gameRunning = true;
 }
 
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
 function drawBackground() {
-  // sand
-  ctx.fillStyle = '#f7d26a';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // sand gradient
+  const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+  grad.addColorStop(0, '#f7d26a');
+  grad.addColorStop(1, '#d99a2b');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // simple trees
-  for (let i = 0; i < 5; i++) {
-    let x = i * 80 + 20;
-    ctx.fillStyle = '#8b5a2b';
-    ctx.fillRect(x, 300, 10, 40);
+  // scattered trees
+  for (let i = 0; i < 12; i++) {
+    let x = (i * 40 + (i%3)*15) % canvas.width;
+    let y = 350 + (i%5)*5;
 
-    ctx.fillStyle = 'green';
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
     ctx.beginPath();
-    ctx.arc(x + 5, 290, 15, 0, Math.PI * 2);
+    ctx.ellipse(x+5, y+45, 12, 5, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // trunk
+    ctx.fillStyle = '#8b5a2b';
+    ctx.fillRect(x, y, 8, 35);
+
+    // leaves
+    ctx.fillStyle = '#2e8b57';
+    ctx.beginPath();
+    ctx.arc(x+4, y, 14, 0, Math.PI*2);
     ctx.fill();
   }
 }
@@ -125,28 +160,31 @@ function loop() {
     lion.cells.pop();
   }
 
-  // draw zebra 🦓
+  // draw zebras
   ctx.font = '18px Arial';
-  ctx.fillText('🦓', zebra.x, zebra.y + 15);
+  zebras.forEach(z => {
+    ctx.fillText('🦓', z.x, z.y + 15);
+  });
 
   lion.cells.forEach(function(cell, index) {
-    // draw lion body
     ctx.fillStyle = 'orange';
     ctx.fillRect(cell.x, cell.y, grid-2, grid-2);
 
-    // head 🦁
     if (index === 0) {
-      ctx.font = '18px Arial';
-      ctx.fillText('🦁', cell.x, cell.y + 15);
+      ctx.fillText(playerEmoji, cell.x, cell.y + 15);
     }
 
-    // eat zebra
-    if (cell.x === zebra.x && cell.y === zebra.y) {
-      lion.maxCells++;
-      score++;
-      zebra.x = getRandomInt(0, 20) * grid;
-      zebra.y = getRandomInt(0, 20) * grid;
-    }
+    // eating multiple zebras
+    zebras.forEach((z, zi) => {
+      if (cell.x === z.x && cell.y === z.y) {
+        lion.maxCells++;
+        score++;
+        zebras[zi] = {
+          x: Math.floor(Math.random() * 25) * grid,
+          y: Math.floor(Math.random() * 25) * grid
+        };
+      }
+    });
 
     // self collision
     for (let i = index + 1; i < lion.cells.length; i++) {
@@ -159,15 +197,17 @@ function loop() {
     }
   });
 
-  // draw score
+  // score
   ctx.fillStyle = '#222';
-  ctx.font = '16px Arial';
-  ctx.fillText('Score: ' + score, 10, 20);
+  ctx.font = '18px Arial';
+  ctx.fillText('Score: ' + score, 10, 25);
 }
 
 // controls
 
 document.addEventListener('keydown', function(e) {
+  if (!lion) return;
+
   if (e.key === 'ArrowLeft' && lion.dx === 0) {
     lion.dx = -grid;
     lion.dy = 0;
